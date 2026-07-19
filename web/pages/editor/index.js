@@ -10,15 +10,16 @@ export default function EditorLogin() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (adminApi.isLoggedIn()) router.push('/editor/dashboard');
-  }, []);
+    if (!router.isReady) return;
+    if (adminApi.isLoggedIn()) router.push(router.query.next || '/editor/dashboard');
+  }, [router.isReady]);
 
   async function entrar() {
     setLoading(true);
     setError('');
     try {
       await adminApi.login(username, password);
-      router.push('/editor/dashboard');
+      router.push(router.query.next || '/editor/dashboard');
     } catch (e) {
       setError(e.message);
       setLoading(false);

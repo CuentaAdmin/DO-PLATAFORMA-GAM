@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { api } from '../../lib/api';
+import { adminApi } from '../../lib/adminApi';
 
 export default function HostCreate() {
   const router = useRouter();
@@ -9,8 +10,14 @@ export default function HostCreate() {
   const [mode, setMode] = useState('group');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [autorizado, setAutorizado] = useState(false);
 
   useEffect(() => {
+    if (!adminApi.isLoggedIn()) {
+      router.push('/editor?next=/host');
+      return;
+    }
+    setAutorizado(true);
     api.getGames()
       .then((list) => {
         setGames(list);
@@ -18,6 +25,8 @@ export default function HostCreate() {
       })
       .catch((e) => setError(e.message));
   }, []);
+
+  if (!autorizado) return <div className="container center">Verificando acceso...</div>;
 
   async function crearSala() {
     setLoading(true);

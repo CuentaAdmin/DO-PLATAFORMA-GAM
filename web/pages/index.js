@@ -29,11 +29,6 @@ export default function Home() {
           Entrar a la sala
         </button>
       </div>
-
-      <p className="subtitle" style={{ marginTop: 32, textAlign: 'center' }}>
-        ¿Eres el presentador?{' '}
-        <a href="/host" style={{ color: '#60a5fa' }}>Crea una sala aquí</a>
-      </p>
     </div>
   );
 }
