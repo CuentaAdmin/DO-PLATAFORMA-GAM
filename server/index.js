@@ -215,6 +215,43 @@ app.get('/api/images/:id', async (req, res) => {
 });
 
 // ------------------------------------------------------------------
+// Panel completo de estadísticas — útil sobre todo en modo individual,
+// donde cada quien va a su ritmo por las preguntas
+// ------------------------------------------------------------------
+app.get('/api/sessions/:roomCode/dashboard', async (req, res) => {
+  try {
+    const { roomCode } = req.params;
+    const session = await pool.query('select id from sessions where room_code = $1', [roomCode]);
+    if (session.rowCount === 0) return res.status(404).json({ error: 'Sala no encontrada' });
+    const sessionId = session.rows[0].id;
+
+    const participantesResult = await pool.query(
+      'select count(*)::int as total from participants where session_id = $1',
+      [sessionId]
+    );
+
+    const choicesResult = await pool.query(
+      `select step_id, path_id, count(*)::int as total
+       from choices
+       where session_id = $1
+       group by step_id, path_id`,
+      [sessionId]
+    );
+
+    const stepsStats = {};
+    for (const row of choicesResult.rows) {
+      if (!stepsStats[row.step_id]) stepsStats[row.step_id] = {};
+      stepsStats[row.step_id][row.path_id] = row.total;
+    }
+
+    res.json({ participantsCount: participantesResult.rows[0].total, stepsStats });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error obteniendo el panel de estadísticas' });
+  }
+});
+
+// ------------------------------------------------------------------
 // Listado PÚBLICO de juegos disponibles (para la pantalla de crear sesión)
 // ------------------------------------------------------------------
 app.get('/api/games', async (req, res) => {
