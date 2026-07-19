@@ -27,6 +27,7 @@ export const api = {
       body: JSON.stringify({ participantId, stepId, pathId, isCorrect }),
     }),
   getStats: (roomCode, stepId) => req(`/api/sessions/${roomCode}/stats/${stepId}`),
+  getDashboard: (roomCode) => req(`/api/sessions/${roomCode}/dashboard`),
   advanceSession: (roomCode, hostToken, nextStep, status) =>
     req(`/api/sessions/${roomCode}/advance`, {
       method: 'POST',

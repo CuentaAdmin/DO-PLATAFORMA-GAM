@@ -20,8 +20,8 @@ export default function Present() {
   const [hostToken, setHostToken] = useState(null);
   const [participantsCount, setParticipantsCount] = useState(0);
   const [currentStepId, setCurrentStepId] = useState(null);
-  const [stats, setStats] = useState({});
-  const [phase, setPhase] = useState('lobby'); // lobby | question | feedback | end
+  const [stepsStats, setStepsStats] = useState({}); // { [stepId]: { [pathId]: total } }
+  const [phase, setPhase] = useState('lobby'); // lobby | question | feedback | end | dashboard
   const [feedbackPathId, setFeedbackPathId] = useState(null);
   const socketRef = useRef(null);
 
@@ -31,7 +31,13 @@ export default function Present() {
 
     api.getSession(roomCode).then((s) => {
       setSession(s);
-      if (s.current_step) {
+      if (s.mode === 'individual' && s.status !== 'lobby') {
+        api.getDashboard(roomCode).then((d) => {
+          setParticipantsCount(d.participantsCount);
+          setStepsStats(d.stepsStats);
+        });
+        setPhase(s.status === 'finished' ? 'end' : 'dashboard');
+      } else if (s.current_step) {
         setCurrentStepId(s.current_step);
         setPhase(s.status === 'finished' ? 'end' : 'question');
       }
@@ -42,14 +48,10 @@ export default function Present() {
 
     socket.on('participant:joined', () => setParticipantsCount((n) => n + 1));
     socket.on('stats:updated', ({ stepId, stats }) => {
-      setCurrentStepId((actual) => {
-        if (actual === stepId) setStats(stats);
-        return actual;
-      });
+      setStepsStats((prev) => ({ ...prev, [stepId]: stats }));
     });
     socket.on('session:advanced', ({ currentStep, status }) => {
       setCurrentStepId(currentStep);
-      setStats({});
       setPhase(status === 'finished' ? 'end' : 'question');
       setFeedbackPathId(null);
     });
@@ -69,6 +71,9 @@ export default function Present() {
 
   async function iniciarJuego() {
     await api.advanceSession(roomCode, hostToken, content.startStepId, 'playing');
+    if (session.mode === 'individual') {
+      setPhase('dashboard');
+    }
   }
 
   async function salirYTerminar() {
@@ -83,6 +88,7 @@ export default function Present() {
   }
 
   async function cerrarVotacionYContinuar() {
+    const stats = stepsStats[currentStepId] || {};
     const step = content.steps[currentStepId];
     const pathIdGanador = ganador(stats) || step.paths[0].id;
     const path = step.paths.find((p) => p.id === pathIdGanador);
@@ -101,15 +107,17 @@ export default function Present() {
     }, 3500);
   }
 
+  const exitButton = (
+    <button className="btn btn-secondary" style={{ width: 'auto', padding: '8px 14px' }} onClick={salirYTerminar}>
+      ✕ Salir
+    </button>
+  );
+
   // -------------------- LOBBY --------------------
   if (phase === 'lobby') {
     return (
       <div className="present-wrap center">
-        <div style={{ textAlign: 'right' }}>
-          <button className="btn btn-secondary" style={{ width: 'auto', padding: '8px 14px' }} onClick={salirYTerminar}>
-            ✕ Salir
-          </button>
-        </div>
+        <div style={{ textAlign: 'right' }}>{exitButton}</div>
         {content.character?.imageUrl && (
           <img src={content.character.imageUrl} alt={content.character.name} className="present-char" />
         )}
@@ -142,6 +150,51 @@ export default function Present() {
     );
   }
 
+  // -------------------- PANEL EN VIVO (modo individual) --------------------
+  if (phase === 'dashboard') {
+    const stepIds = Object.keys(content.steps);
+    return (
+      <div className="present-wrap">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <p className="badge">Sala {roomCode} · {participantsCount} conectados · avanzando cada quien a su ritmo</p>
+          {exitButton}
+        </div>
+        <h1 className="present-title">Panel en vivo</h1>
+
+        {stepIds.map((stepId) => {
+          const step = content.steps[stepId];
+          const stats = stepsStats[stepId] || {};
+          const total = Object.values(stats).reduce((a, b) => a + b, 0);
+          return (
+            <div key={stepId} className="card" style={{ marginTop: 20 }}>
+              <h3 style={{ marginTop: 0 }}>{step.title}</h3>
+              {step.paths.map((path) => {
+                const votos = stats[path.id] || 0;
+                const pct = total ? Math.round((votos / total) * 100) : 0;
+                return (
+                  <div key={path.id} className="stat-row" style={{ marginTop: 12 }}>
+                    <div className="stat-label" style={{ fontSize: 16 }}>
+                      <span>{path.label}{path.correct ? ' ✔' : ''}</span>
+                      <span>{votos} respuesta{votos === 1 ? '' : 's'}</span>
+                    </div>
+                    <div className="stat-track" style={{ height: 22 }}>
+                      <div className="stat-fill" style={{ width: `${Math.max(pct, votos > 0 ? 6 : 0)}%`, fontSize: 13 }}>
+                        {pct > 0 ? `${pct}%` : ''}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              <p className="present-total" style={{ textAlign: 'left', marginTop: 10 }}>
+                Total de respuestas en esta pregunta: {total}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   const step = content.steps[currentStepId];
 
   // -------------------- FEEDBACK (correcto/incorrecto) --------------------
@@ -150,27 +203,22 @@ export default function Present() {
     const screen = path.correct ? content.screens.correct : content.screens.incorrect;
     return (
       <div className="present-wrap center">
-        <div style={{ textAlign: 'right' }}>
-          <button className="btn btn-secondary" style={{ width: 'auto', padding: '8px 14px' }} onClick={salirYTerminar}>
-            ✕ Salir
-          </button>
-        </div>
+        <div style={{ textAlign: 'right' }}>{exitButton}</div>
         <h1 className="present-title">{screen.title}</h1>
         {screen.imageUrl && <img className="present-scene" src={screen.imageUrl} alt={screen.title} />}
       </div>
     );
   }
 
-  // -------------------- PREGUNTA EN VIVO --------------------
+  // -------------------- PREGUNTA EN VIVO (modo grupal) --------------------
+  const stats = stepsStats[currentStepId] || {};
   const totalVotos = Object.values(stats).reduce((a, b) => a + b, 0);
 
   return (
     <div className="present-wrap">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <p className="badge">Sala {roomCode} · {participantsCount} conectados</p>
-        <button className="btn btn-secondary" style={{ width: 'auto', padding: '8px 14px' }} onClick={salirYTerminar}>
-          ✕ Salir
-        </button>
+        {exitButton}
       </div>
       <h1 className="present-title">{step.title}</h1>
       {step.imageUrl && <img className="present-scene" src={step.imageUrl} alt="" />}
