@@ -71,6 +71,17 @@ export default function Present() {
     await api.advanceSession(roomCode, hostToken, content.startStepId, 'playing');
   }
 
+  async function salirYTerminar() {
+    const confirmar = window.confirm('¿Seguro que quieres salir? Esto termina la sesión para todos los participantes.');
+    if (!confirmar) return;
+    try {
+      await api.advanceSession(roomCode, hostToken, null, 'finished');
+    } catch (e) {
+      // aunque falle la notificación, igual dejamos salir al presentador
+    }
+    router.push('/host');
+  }
+
   async function cerrarVotacionYContinuar() {
     const step = content.steps[currentStepId];
     const pathIdGanador = ganador(stats) || step.paths[0].id;
@@ -92,6 +103,11 @@ export default function Present() {
   if (phase === 'lobby') {
     return (
       <div className="container center">
+        <div style={{ textAlign: 'right' }}>
+          <button className="btn btn-secondary" style={{ width: 'auto', padding: '8px 14px' }} onClick={salirYTerminar}>
+            ✕ Salir
+          </button>
+        </div>
         {content.character?.imageUrl && (
           <img src={content.character.imageUrl} alt={content.character.name}
             style={{ maxWidth: 260, margin: '0 auto', display: 'block' }} />
@@ -133,6 +149,11 @@ export default function Present() {
     const screen = path.correct ? content.screens.correct : content.screens.incorrect;
     return (
       <div className="container center">
+        <div style={{ textAlign: 'right' }}>
+          <button className="btn btn-secondary" style={{ width: 'auto', padding: '8px 14px' }} onClick={salirYTerminar}>
+            ✕ Salir
+          </button>
+        </div>
         <h1 className="title">{screen.title}</h1>
         {screen.imageUrl && <img className="scene" src={screen.imageUrl} alt={screen.title} />}
       </div>
@@ -144,7 +165,12 @@ export default function Present() {
 
   return (
     <div className="container">
-      <p className="badge">Sala {roomCode} · {participantsCount} conectados</p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <p className="badge">Sala {roomCode} · {participantsCount} conectados</p>
+        <button className="btn btn-secondary" style={{ width: 'auto', padding: '8px 14px' }} onClick={salirYTerminar}>
+          ✕ Salir
+        </button>
+      </div>
       <h1 className="title">{step.title}</h1>
       {step.imageUrl && <img className="scene" src={step.imageUrl} alt="" />}
 

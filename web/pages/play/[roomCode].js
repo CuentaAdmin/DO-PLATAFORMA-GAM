@@ -82,6 +82,10 @@ export default function Play() {
     }, 2500);
   }
 
+  function salir() {
+    router.push('/');
+  }
+
   if (!session) return <div className="container center">{error || 'Cargando...'}</div>;
 
   // -------------------- PANTALLA DE NOMBRE --------------------
@@ -108,6 +112,11 @@ export default function Play() {
   if (phase === 'waiting') {
     return (
       <div className="container center">
+        <div style={{ textAlign: 'right' }}>
+          <button className="btn btn-secondary" style={{ width: 'auto', padding: '8px 14px' }} onClick={salir}>
+            ✕ Salir
+          </button>
+        </div>
         <h1 className="title">Listo, {name}</h1>
         <p className="subtitle">Espera a que el presentador inicie el juego...</p>
       </div>
@@ -140,6 +149,11 @@ export default function Play() {
   if (phase === 'voted') {
     return (
       <div className="container center">
+        <div style={{ textAlign: 'right' }}>
+          <button className="btn btn-secondary" style={{ width: 'auto', padding: '8px 14px' }} onClick={salir}>
+            ✕ Salir
+          </button>
+        </div>
         <h1 className="title">Voto enviado ✔</h1>
         <p className="subtitle">Esperando a que el presentador continúe...</p>
       </div>
@@ -149,6 +163,11 @@ export default function Play() {
   // -------------------- PREGUNTA --------------------
   return (
     <div className="container">
+      <div style={{ textAlign: 'right' }}>
+        <button className="btn btn-secondary" style={{ width: 'auto', padding: '8px 14px' }} onClick={salir}>
+          ✕ Salir
+        </button>
+      </div>
       <h1 className="title">{step.title}</h1>
       {step.imageUrl && <img className="scene" src={step.imageUrl} alt="" />}
       {step.paths.map((path) => (

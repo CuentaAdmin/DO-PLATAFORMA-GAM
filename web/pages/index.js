@@ -1,30 +1,24 @@
-import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 
+// Página principal — SOLO para participantes. Es segura para compartir:
+// no muestra ninguna opción de crear salas.
 export default function Home() {
   const router = useRouter();
   const [roomCode, setRoomCode] = useState('');
 
   return (
     <div className="container">
-      <h1 className="title">Plataforma de juegos en vivo</h1>
-      <p className="subtitle">Elige qué quieres hacer</p>
+      <h1 className="title">Entrar a una sala</h1>
+      <p className="subtitle">Escribe el código que te dio el presentador</p>
 
       <div className="card">
-        <h3>Soy el presentador</h3>
-        <p className="subtitle">Voy a compartir mi pantalla en Zoom y crear una sala nueva.</p>
-        <Link href="/host"><button className="btn">Crear una sala</button></Link>
-      </div>
-
-      <div className="card">
-        <h3>Soy participante</h3>
-        <p className="subtitle">Tengo un código de sala que me dieron.</p>
         <input
           className="input"
           placeholder="Código de sala (ej: AB12C)"
           value={roomCode}
           onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+          onKeyDown={(e) => e.key === 'Enter' && roomCode.trim() && router.push(`/play/${roomCode.trim()}`)}
         />
         <button
           className="btn"
@@ -35,6 +29,11 @@ export default function Home() {
           Entrar a la sala
         </button>
       </div>
+
+      <p className="subtitle" style={{ marginTop: 32, textAlign: 'center' }}>
+        ¿Eres el presentador?{' '}
+        <a href="/host" style={{ color: '#60a5fa' }}>Crea una sala aquí</a>
+      </p>
     </div>
   );
 }

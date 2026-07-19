@@ -34,6 +34,11 @@ export default function HostCreate() {
 
   return (
     <div className="container">
+      <div style={{ textAlign: 'right' }}>
+        <button className="btn btn-secondary" style={{ width: 'auto', padding: '8px 14px' }} onClick={() => router.push('/')}>
+          ✕ Salir
+        </button>
+      </div>
       <h1 className="title">Crear una sala</h1>
       <p className="subtitle">Elige el juego y la modalidad</p>
 
