@@ -92,6 +92,10 @@ export default function Present() {
   if (phase === 'lobby') {
     return (
       <div className="container center">
+        {content.character?.imageUrl && (
+          <img src={content.character.imageUrl} alt={content.character.name}
+            style={{ maxWidth: 260, margin: '0 auto', display: 'block' }} />
+        )}
         <h1 className="title">{content.character?.name || session.game_name}</h1>
         <p className="subtitle">Modalidad: {session.mode === 'group' ? 'Grupal' : 'Individual'}</p>
 

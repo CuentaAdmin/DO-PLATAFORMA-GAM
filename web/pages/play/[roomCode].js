@@ -88,6 +88,10 @@ export default function Play() {
   if (!participantId) {
     return (
       <div className="container">
+        {session.game_content?.character?.imageUrl && (
+          <img src={session.game_content.character.imageUrl} alt=""
+            style={{ maxWidth: 200, margin: '0 auto 12px', display: 'block' }} />
+        )}
         <h1 className="title">{session.game_name}</h1>
         <p className="subtitle">Escribe tu nombre para unirte a la sala {roomCode}</p>
         {error && <p style={{ color: '#f87171' }}>{error}</p>}
