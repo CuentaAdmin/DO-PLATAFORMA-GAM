@@ -89,6 +89,8 @@ export default function Present() {
     setFeedbackPathId(pathIdGanador);
     setPhase('feedback');
 
+    await api.sendFeedback(roomCode, hostToken, currentStepId, pathIdGanador);
+
     setTimeout(async () => {
       const siguiente = path.nextStepId;
       if (siguiente === 'END') {
@@ -102,29 +104,28 @@ export default function Present() {
   // -------------------- LOBBY --------------------
   if (phase === 'lobby') {
     return (
-      <div className="container center">
+      <div className="present-wrap center">
         <div style={{ textAlign: 'right' }}>
           <button className="btn btn-secondary" style={{ width: 'auto', padding: '8px 14px' }} onClick={salirYTerminar}>
             ✕ Salir
           </button>
         </div>
         {content.character?.imageUrl && (
-          <img src={content.character.imageUrl} alt={content.character.name}
-            style={{ maxWidth: 260, margin: '0 auto', display: 'block' }} />
+          <img src={content.character.imageUrl} alt={content.character.name} className="present-char" />
         )}
-        <h1 className="title">{content.character?.name || session.game_name}</h1>
-        <p className="subtitle">Modalidad: {session.mode === 'group' ? 'Grupal' : 'Individual'}</p>
+        <h1 className="present-title">{content.character?.name || session.game_name}</h1>
+        <p className="subtitle" style={{ fontSize: 20 }}>Modalidad: {session.mode === 'group' ? 'Grupal' : 'Individual'}</p>
 
         <div className="room-code">{roomCode}</div>
 
-        <div className="card">
-          <img src={qrUrl} alt="QR para unirse" style={{ borderRadius: 12 }} />
+        <div className="card" style={{ maxWidth: 320, margin: '16px auto 0' }}>
+          <img src={qrUrl} alt="QR para unirse" style={{ borderRadius: 12, width: '100%' }} />
           <p style={{ marginTop: 12 }}>O entra desde tu celular a:</p>
           <p style={{ wordBreak: 'break-all', color: '#60a5fa' }}>{joinUrl}</p>
           <p className="badge">{participantsCount} conectados</p>
         </div>
 
-        <button className="btn" style={{ marginTop: 24 }} onClick={iniciarJuego}>
+        <button className="btn" style={{ marginTop: 24, maxWidth: 320, margin: '24px auto 0' }} onClick={iniciarJuego}>
           Iniciar juego
         </button>
       </div>
@@ -134,9 +135,9 @@ export default function Present() {
   // -------------------- FIN --------------------
   if (phase === 'end') {
     return (
-      <div className="container center">
-        <h1 className="title">Juego terminado</h1>
-        <p className="subtitle">Gracias por participar</p>
+      <div className="present-wrap center">
+        <h1 className="present-title">Juego terminado</h1>
+        <p className="subtitle" style={{ fontSize: 20 }}>Gracias por participar</p>
       </div>
     );
   }
@@ -148,14 +149,14 @@ export default function Present() {
     const path = step.paths.find((p) => p.id === feedbackPathId);
     const screen = path.correct ? content.screens.correct : content.screens.incorrect;
     return (
-      <div className="container center">
+      <div className="present-wrap center">
         <div style={{ textAlign: 'right' }}>
           <button className="btn btn-secondary" style={{ width: 'auto', padding: '8px 14px' }} onClick={salirYTerminar}>
             ✕ Salir
           </button>
         </div>
-        <h1 className="title">{screen.title}</h1>
-        {screen.imageUrl && <img className="scene" src={screen.imageUrl} alt={screen.title} />}
+        <h1 className="present-title">{screen.title}</h1>
+        {screen.imageUrl && <img className="present-scene" src={screen.imageUrl} alt={screen.title} />}
       </div>
     );
   }
@@ -164,32 +165,38 @@ export default function Present() {
   const totalVotos = Object.values(stats).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="container">
+    <div className="present-wrap">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <p className="badge">Sala {roomCode} · {participantsCount} conectados</p>
         <button className="btn btn-secondary" style={{ width: 'auto', padding: '8px 14px' }} onClick={salirYTerminar}>
           ✕ Salir
         </button>
       </div>
-      <h1 className="title">{step.title}</h1>
-      {step.imageUrl && <img className="scene" src={step.imageUrl} alt="" />}
+      <h1 className="present-title">{step.title}</h1>
+      {step.imageUrl && <img className="present-scene" src={step.imageUrl} alt="" />}
 
       {step.paths.map((path) => {
         const votos = stats[path.id] || 0;
         const pct = totalVotos ? Math.round((votos / totalVotos) * 100) : 0;
         return (
-          <div key={path.id} style={{ marginTop: 16 }}>
-            <div>{path.label}</div>
-            <div className="bar-row">
-              <div className="bar-track"><div className="bar-fill" style={{ width: `${pct}%` }} /></div>
-              <span style={{ minWidth: 60, fontSize: 14 }}>{votos} · {pct}%</span>
+          <div key={path.id} className="stat-row">
+            <div className="stat-label">
+              <span>{path.label}</span>
+              <span>{votos} voto{votos === 1 ? '' : 's'}</span>
+            </div>
+            <div className="stat-track">
+              <div className="stat-fill" style={{ width: `${Math.max(pct, votos > 0 ? 6 : 0)}%` }}>
+                {pct > 0 ? `${pct}%` : ''}
+              </div>
             </div>
           </div>
         );
       })}
 
+      <p className="present-total">Total de votos: {totalVotos}</p>
+
       {session.mode === 'group' && (
-        <button className="btn" style={{ marginTop: 28 }} onClick={cerrarVotacionYContinuar}>
+        <button className="btn" style={{ marginTop: 28, maxWidth: 420, margin: '28px auto 0' }} onClick={cerrarVotacionYContinuar}>
           Cerrar votación y continuar
         </button>
       )}

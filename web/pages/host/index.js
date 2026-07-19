@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { api } from '../../lib/api';
 import { adminApi } from '../../lib/adminApi';
+import AdminNav from '../../components/AdminNav';
 
 export default function HostCreate() {
   const router = useRouter();
@@ -43,11 +44,7 @@ export default function HostCreate() {
 
   return (
     <div className="container">
-      <div style={{ textAlign: 'right' }}>
-        <button className="btn btn-secondary" style={{ width: 'auto', padding: '8px 14px' }} onClick={() => router.push('/')}>
-          ✕ Salir
-        </button>
-      </div>
+      <AdminNav active="host" />
       <h1 className="title">Crear una sala</h1>
       <p className="subtitle">Elige el juego y la modalidad</p>
 

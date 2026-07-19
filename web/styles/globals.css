@@ -22,3 +22,14 @@ input, select { font-family: inherit; }
 .room-code { font-size: 40px; font-weight: 800; letter-spacing: 6px; background: #1e293b; padding: 16px; border-radius: 12px; text-align: center; margin-top: 16px; }
 img.scene { width: 100%; border-radius: 16px; margin-top: 16px; max-height: 360px; object-fit: cover; }
 .badge { display: inline-block; background: #334155; padding: 4px 10px; border-radius: 20px; font-size: 13px; margin-top: 8px; }
+
+/* ---- Vista de proyección (presentador): pensada para pantalla completa en Zoom ---- */
+.present-wrap { max-width: 1100px; margin: 0 auto; padding: 24px 40px; }
+.present-title { font-size: 42px; font-weight: 800; margin: 10px 0; line-height: 1.2; }
+.present-scene { width: 100%; max-height: 420px; object-fit: contain; border-radius: 16px; margin-top: 10px; background: #0b1220; }
+.present-char { max-width: 320px; margin: 0 auto; display: block; }
+.stat-row { margin-top: 22px; }
+.stat-label { font-size: 22px; font-weight: 600; display: flex; justify-content: space-between; }
+.stat-track { background: #334155; border-radius: 10px; height: 34px; overflow: hidden; margin-top: 8px; }
+.stat-fill { background: linear-gradient(90deg,#2563eb,#3b82f6); height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: white; font-weight: 700; font-size: 16px; transition: width 0.4s ease; }
+.present-total { font-size: 18px; color: #94a3b8; margin-top: 18px; text-align: center; }

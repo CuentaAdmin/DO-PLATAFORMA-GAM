@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { adminApi } from '../../lib/adminApi';
+import AdminNav from '../../components/AdminNav';
 
 function contenidoVacio() {
   return {
@@ -149,9 +150,10 @@ export default function GameEditor() {
 
   return (
     <div className="container">
+      <AdminNav active="editor" />
       <button className="btn btn-secondary" style={{ width: 'auto', padding: '8px 14px', marginBottom: 12 }}
         onClick={() => router.push('/editor/dashboard')}>
-        ← Volver
+        ← Volver a mis juegos
       </button>
       <h1 className="title">Editor del juego</h1>
       {error && <p style={{ color: '#f87171' }}>{error}</p>}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { adminApi } from '../../lib/adminApi';
+import AdminNav from '../../components/AdminNav';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -39,13 +40,8 @@ export default function Dashboard() {
 
   return (
     <div className="container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 className="title">Tus juegos</h1>
-        <button className="btn btn-secondary" style={{ width: 'auto', padding: '10px 16px' }}
-          onClick={() => { adminApi.logout(); router.push('/editor'); }}>
-          Salir
-        </button>
-      </div>
+      <AdminNav active="editor" />
+      <h1 className="title">Tus juegos</h1>
       <p className="subtitle">Conectado como {adminApi.currentUsername()}</p>
 
       {error && <p style={{ color: '#f87171' }}>{error}</p>}

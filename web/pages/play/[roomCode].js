@@ -36,6 +36,15 @@ export default function Play() {
     socketRef.current = socket;
 
     if (session?.mode === 'group') {
+      socket.on('session:feedback', ({ stepId, winningPathId }) => {
+        setCurrentStepId((actualStepId) => {
+          if (actualStepId === stepId) {
+            setChosenPathId(winningPathId);
+            setPhase('feedback');
+          }
+          return actualStepId;
+        });
+      });
       socket.on('session:advanced', ({ currentStep, status }) => {
         setCurrentStepId(currentStep);
         setChosenPathId(null);
@@ -43,7 +52,10 @@ export default function Play() {
       });
     }
 
-    return () => socket.off('session:advanced');
+    return () => {
+      socket.off('session:feedback');
+      socket.off('session:advanced');
+    };
   }, [roomCode, participantId, session]);
 
   async function unirse() {

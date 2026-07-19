@@ -32,4 +32,9 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ hostToken, nextStep, status }),
     }),
+  sendFeedback: (roomCode, hostToken, stepId, winningPathId) =>
+    req(`/api/sessions/${roomCode}/feedback`, {
+      method: 'POST',
+      body: JSON.stringify({ hostToken, stepId, winningPathId }),
+    }),
 };
