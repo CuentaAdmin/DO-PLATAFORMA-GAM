@@ -384,6 +384,28 @@ app.get('/api/sessions/:roomCode/stats/:stepId', async (req, res) => {
 });
 
 // ------------------------------------------------------------------
+// El presentador avisa a TODOS (incluidos los celulares) que muestren
+// la pantalla de correcto/incorrecto del camino ganador — antes de avanzar
+// body: { hostToken, stepId, winningPathId }
+// ------------------------------------------------------------------
+app.post('/api/sessions/:roomCode/feedback', async (req, res) => {
+  try {
+    const { roomCode } = req.params;
+    const { hostToken, stepId, winningPathId } = req.body;
+
+    const session = await pool.query('select host_token from sessions where room_code = $1', [roomCode]);
+    if (session.rowCount === 0) return res.status(404).json({ error: 'Sala no encontrada' });
+    if (session.rows[0].host_token !== hostToken) return res.status(403).json({ error: 'No autorizado' });
+
+    io.to(roomCode).emit('session:feedback', { stepId, winningPathId });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error enviando el feedback' });
+  }
+});
+
+// ------------------------------------------------------------------
 // El presentador (host) avanza la sala al siguiente paso — solo modo grupal
 // body: { hostToken, nextStep, status }
 // ------------------------------------------------------------------
