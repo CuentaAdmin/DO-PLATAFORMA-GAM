@@ -55,7 +55,7 @@ function ImageUploader({ gameId, url, onChange, label }) {
       {url && <img src={url} alt="" style={{ width: '100%', maxHeight: 160, objectFit: 'cover', borderRadius: 8, marginTop: 6 }} />}
       <input type="file" accept="image/*" onChange={handleFile} style={{ marginTop: 8 }} />
       {subiendo && <p className="subtitle">Subiendo imagen...</p>}
-      {error && <p style={{ color: '#f87171', fontSize: 13 }}>{error}</p>}
+      {error && <p style={{ color: '#e5484d', fontSize: 13 }}>{error}</p>}
     </div>
   );
 }
@@ -156,8 +156,8 @@ export default function GameEditor() {
         ← Volver a mis juegos
       </button>
       <h1 className="title">Editor del juego</h1>
-      {error && <p style={{ color: '#f87171' }}>{error}</p>}
-      {guardado && <p style={{ color: '#4ade80' }}>✔ Guardado correctamente</p>}
+      {error && <p style={{ color: '#e5484d' }}>{error}</p>}
+      {guardado && <p style={{ color: '#4c9938' }}>✔ Guardado correctamente</p>}
 
       <div className="card">
         <h3>Personaje</h3>
@@ -213,7 +213,7 @@ export default function GameEditor() {
 
             <h4 style={{ marginTop: 16 }}>Caminos (opciones)</h4>
             {step.paths.map((path) => (
-              <div key={path.id} style={{ border: '1px solid #334155', borderRadius: 10, padding: 12, marginTop: 10 }}>
+              <div key={path.id} style={{ border: '1px solid #dbe4ee', borderRadius: 10, padding: 12, marginTop: 10 }}>
                 <label className="label">Texto de la opción</label>
                 <input className="input" value={path.label}
                   onChange={(e) => actualizarPath(stepId, path.id, 'label', e.target.value)} />
@@ -248,7 +248,7 @@ export default function GameEditor() {
 
       <button className="btn" style={{ marginTop: 16 }} onClick={agregarStep}>+ Agregar nueva pregunta</button>
 
-      <button className="btn" style={{ marginTop: 28, background: '#16a34a' }} disabled={guardando} onClick={guardar}>
+      <button className="btn" style={{ marginTop: 28, background: '#60bb46' }} disabled={guardando} onClick={guardar}>
         {guardando ? 'Guardando...' : 'Guardar juego'}
       </button>
     </div>

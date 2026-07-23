@@ -129,7 +129,7 @@ export default function Present() {
         <div className="card" style={{ maxWidth: 320, margin: '16px auto 0' }}>
           <img src={qrUrl} alt="QR para unirse" style={{ borderRadius: 12, width: '100%' }} />
           <p style={{ marginTop: 12 }}>O entra desde tu celular a:</p>
-          <p style={{ wordBreak: 'break-all', color: '#60a5fa' }}>{joinUrl}</p>
+          <p style={{ wordBreak: 'break-all', color: '#00aeef' }}>{joinUrl}</p>
           <p className="badge">{participantsCount} conectados</p>
         </div>
 
@@ -244,7 +244,7 @@ export default function Present() {
       <p className="present-total">Total de votos: {totalVotos}</p>
 
       {session.mode === 'group' && (
-        <button className="btn" style={{ marginTop: 28, maxWidth: 420, margin: '28px auto 0' }} onClick={cerrarVotacionYContinuar}>
+        <button className="btn btn-accent" style={{ marginTop: 28, maxWidth: 420, margin: '28px auto 0' }} onClick={cerrarVotacionYContinuar}>
           Cerrar votación y continuar
         </button>
       )}

@@ -11,10 +11,11 @@ export default function AdminNav({ active }) {
         padding: '8px 14px',
         borderRadius: 8,
         textDecoration: 'none',
-        color: 'white',
-        background: active === key ? '#2563eb' : '#334155',
+        background: active === key ? '#00aeef' : '#eef3f8',
+        color: active === key ? 'white' : '#16233a',
+        border: active === key ? 'none' : '1px solid #dbe4ee',
         fontSize: 14,
-        fontWeight: 600,
+        fontWeight: 700,
       }}
     >
       {label}

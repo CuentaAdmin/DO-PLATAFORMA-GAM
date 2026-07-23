@@ -31,7 +31,7 @@ export default function EditorLogin() {
       <h1 className="title">Editor de contenido</h1>
       <p className="subtitle">Inicia sesión para crear y editar tus juegos</p>
       <div className="card">
-        {error && <p style={{ color: '#f87171' }}>{error}</p>}
+        {error && <p style={{ color: '#e5484d' }}>{error}</p>}
         <label className="label">Usuario</label>
         <input className="input" value={username} onChange={(e) => setUsername(e.target.value)} />
         <label className="label">Contraseña</label>

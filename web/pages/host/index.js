@@ -49,7 +49,7 @@ export default function HostCreate() {
       <p className="subtitle">Elige el juego y la modalidad</p>
 
       <div className="card">
-        {error && <p style={{ color: '#f87171' }}>{error}</p>}
+        {error && <p style={{ color: '#e5484d' }}>{error}</p>}
 
         <label className="label">Juego</label>
         {games.length === 0 && !error && <p className="subtitle">Cargando juegos...</p>}

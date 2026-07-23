@@ -15,6 +15,7 @@ export default function Play() {
   const [currentStepId, setCurrentStepId] = useState(null);
   const [phase, setPhase] = useState('waiting'); // waiting | question | voted | feedback | end
   const [chosenPathId, setChosenPathId] = useState(null);
+  const [pendingNextStepId, setPendingNextStepId] = useState(null);
   const socketRef = useRef(null);
 
   useEffect(() => {
@@ -81,17 +82,21 @@ export default function Play() {
       return;
     }
 
-    // Modo individual: cada quien avanza en su propio camino
+    // Modo individual: cada quien avanza en su propio camino, a su propio ritmo.
+    // Se queda viendo la pantalla de correcto/incorrecto hasta que él mismo decida continuar.
+    setPendingNextStepId(path.nextStepId);
     setPhase('feedback');
-    setTimeout(() => {
-      if (path.nextStepId === 'END') {
-        setPhase('end');
-      } else {
-        setCurrentStepId(path.nextStepId);
-        setChosenPathId(null);
-        setPhase('question');
-      }
-    }, 2500);
+  }
+
+  function continuarDespuesDeRespuesta() {
+    if (pendingNextStepId === 'END') {
+      setPhase('end');
+    } else {
+      setCurrentStepId(pendingNextStepId);
+      setChosenPathId(null);
+      setPhase('question');
+    }
+    setPendingNextStepId(null);
   }
 
   function salir() {
@@ -110,7 +115,7 @@ export default function Play() {
         )}
         <h1 className="title">{session.game_name}</h1>
         <p className="subtitle">Escribe tu nombre para unirte a la sala {roomCode}</p>
-        {error && <p style={{ color: '#f87171' }}>{error}</p>}
+        {error && <p style={{ color: '#e5484d' }}>{error}</p>}
         <div className="card">
           <input className="input" placeholder="Tu nombre" value={name} onChange={(e) => setName(e.target.value)} />
           <button className="btn" style={{ marginTop: 16 }} disabled={!name.trim()} onClick={unirse}>
@@ -154,6 +159,13 @@ export default function Play() {
       <div className="container center">
         <h1 className="title">{screen.title}</h1>
         {screen.imageUrl && <img className="scene" src={screen.imageUrl} alt="" />}
+        {session.mode === 'individual' ? (
+          <button className="btn" style={{ marginTop: 20 }} onClick={continuarDespuesDeRespuesta}>
+            {pendingNextStepId === 'END' ? 'Ver resultado final' : 'Continuar →'}
+          </button>
+        ) : (
+          <p className="subtitle" style={{ marginTop: 16 }}>Esperando a que el presentador continúe...</p>
+        )}
       </div>
     );
   }

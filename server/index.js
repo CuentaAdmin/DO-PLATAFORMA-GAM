@@ -19,7 +19,15 @@ const io = new Server(server, { cors: { origin: '*' } });
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
+  max: 20, // conexiones simultáneas máximas hacia Neon (deja margen dentro del plan gratuito)
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 8000,
 });
+
+// Límite de participantes por sala. Si se llega a este número, el sistema deja de aceptar
+// gente nueva en ESA sala (con un mensaje claro), en vez de arriesgarse a saturar el servicio
+// gratuito para todos los que ya están jugando.
+const MAX_PARTICIPANTS_PER_SESSION = parseInt(process.env.MAX_PARTICIPANTS_PER_SESSION || '300', 10);
 
 // ------------------------------------------------------------------
 // Utilidad: generar un código de sala corto y fácil de leer en pantalla
@@ -343,6 +351,11 @@ app.post('/api/sessions/:roomCode/join', async (req, res) => {
     const session = await pool.query('select id from sessions where room_code = $1', [roomCode]);
     if (session.rowCount === 0) return res.status(404).json({ error: 'Sala no encontrada' });
     const sessionId = session.rows[0].id;
+
+    const conteo = await pool.query('select count(*)::int as total from participants where session_id = $1', [sessionId]);
+    if (conteo.rows[0].total >= MAX_PARTICIPANTS_PER_SESSION) {
+      return res.status(403).json({ error: `La sala llegó al máximo de ${MAX_PARTICIPANTS_PER_SESSION} participantes. Ya no se pueden unir más personas a esta sala.` });
+    }
 
     const insert = await pool.query(
       `insert into participants (session_id, name) values ($1, $2)

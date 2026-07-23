@@ -44,7 +44,7 @@ export default function Dashboard() {
       <h1 className="title">Tus juegos</h1>
       <p className="subtitle">Conectado como {adminApi.currentUsername()}</p>
 
-      {error && <p style={{ color: '#f87171' }}>{error}</p>}
+      {error && <p style={{ color: '#e5484d' }}>{error}</p>}
 
       {games.map((g) => (
         <div className="card" key={g.id} style={{ cursor: 'pointer' }} onClick={() => router.push(`/editor/${g.id}`)}>
